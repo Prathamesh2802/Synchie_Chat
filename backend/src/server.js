@@ -44,6 +44,9 @@ app.use(cookieParser());
 app.use("/api/auth", router);
 app.use("/api/message", msgRouter);
 app.use("/api/relationships", friendrouter);
+app.get("/test", (req, res) => {
+  res.status(200).json({ message: "Hello" });
+});
 
 // Old Logic
 // connectdb().then(() => {
