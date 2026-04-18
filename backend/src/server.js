@@ -18,6 +18,8 @@ import helmet from "helmet";
 
 dotenv.config();
 
+const PORT = process.env.PORT || 5000;
+
 // const app = express();
 
 // app.use(
@@ -60,8 +62,8 @@ async function startServer() {
 
     await connectRedis();
 
-    server.listen(process.env.PORT, () => {
-      console.log("Started on Port", process.env.PORT);
+    server.listen(PORT, () => {
+      console.log("Started on Port", PORT);
     });
   } catch (error) {
     console.log(error);
