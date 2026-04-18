@@ -63,7 +63,7 @@ async function startServer() {
     await connectRedis();
 
     server.listen(PORT, () => {
-      console.log("Started on Port", PORT);
+      console.log("Started on Port ", PORT);
     });
   } catch (error) {
     console.log(error);
