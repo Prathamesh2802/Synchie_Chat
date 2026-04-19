@@ -118,6 +118,8 @@ const signup = async (req, res) => {
 
       user.password = hashedpass;
 
+      user.verificationExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
       await user.save();
 
       const otpRecord = await OTP.findOne({
@@ -152,6 +154,8 @@ const signup = async (req, res) => {
         userName,
         email,
         password: hashedpass,
+        // Added Date Column
+        verificationExpiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
 
         isVerified: false,
       });
@@ -253,7 +257,7 @@ const verifyOtp = async (req, res) => {
       { _id: user._id },
       {
         $set: { isVerified: true },
-        $unset: { verificationExpiresAt: 1 },
+        $unset: { verificationExpiresAt: "" },
       },
     );
 

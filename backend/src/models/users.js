@@ -67,7 +67,7 @@ const userschema = new mongoose.Schema(
     },
     verificationExpiresAt: {
       type: Date,
-      default: () => new Date(Date.now() + 24 * 60 * 60 * 1000),
+      // default: () => new Date(Date.now() + 24 * 60 * 60 * 1000), No need for Default
     },
   },
   { timestamps: true },
