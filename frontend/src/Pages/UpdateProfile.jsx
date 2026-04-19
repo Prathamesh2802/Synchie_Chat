@@ -53,7 +53,7 @@ function UpdateProfile() {
       if (!status) return;
       navigate("/");
     } catch (error) {
-      console.log(error);
+      console.log(error.message);
     }
   }
 

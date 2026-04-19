@@ -188,7 +188,7 @@ const signup = async (req, res) => {
       message: "OTP sent successfully",
     });
   } catch (error) {
-    console.error(error);
+    console.error(error.message);
     res.status(500).json({
       message: error.message,
     });
@@ -618,7 +618,7 @@ const updateDetails = async (req, res) => {
       profilepic: updatedUser.profilepic,
     });
   } catch (error) {
-    console.error(error);
+    console.error(error.message);
     res.status(500).json({ message: "Error Occurred while uploading data" });
   }
 };

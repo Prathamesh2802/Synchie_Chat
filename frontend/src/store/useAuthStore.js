@@ -33,14 +33,14 @@ export const useAuthStore = create((set, get) => ({
         set({ onlineUsers: userIds });
       });
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error?.response?.data?.message);
     }
   },
   disconnectSocket: () => {
     try {
       if (get().socket?.connected) get().socket.disconnect();
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error?.response?.data?.message);
     }
   },
   //
@@ -51,7 +51,7 @@ export const useAuthStore = create((set, get) => ({
       set({ authUser: res.data });
       get().connectSocket();
     } catch (error) {
-      console.log("error in check auth:", error);
+      console.log("error in check auth:", error.message);
       set({ authUser: null });
     } finally {
       set({ isCheckingAuth: false });
@@ -184,7 +184,7 @@ export const useAuthStore = create((set, get) => ({
       set({ authUser: res.data });
       toast.success("Image Uploaded successfully");
     } catch (error) {
-      console.log("Error in profile upload: ", error);
+      console.log("Error in profile upload: ", error.message);
       toast.error(error?.response?.data?.message);
     } finally {
       set({ isUpdatingProfile: false });
@@ -199,7 +199,7 @@ export const useAuthStore = create((set, get) => ({
       toast.success("User Details updated successfully.");
       return true;
     } catch (error) {
-      console.log("Error in profile upload: ", error);
+      console.log("Error in profile upload: ", error.message);
       toast.error(error?.response?.data?.message);
       return false;
     } finally {

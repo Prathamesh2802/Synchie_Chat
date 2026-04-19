@@ -87,7 +87,7 @@ export const useChatStore = create((set, get) => ({
       toast.success(clearRecords?.data?.message);
       set({ messages: [] });
     } catch (error) {
-      console.error(error);
+      console.error(error.message);
       toast.error(error?.response?.data?.message);
     }
   },

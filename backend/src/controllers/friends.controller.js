@@ -49,7 +49,7 @@ const sendFriendRequest = async (req, res) => {
 
     res.status(201).json({ message: "Friend request sent successfully" });
   } catch (error) {
-    console.error(error);
+    console.error(error.message);
     res.status(400).json({ message: "Error Occurred" });
   }
 };

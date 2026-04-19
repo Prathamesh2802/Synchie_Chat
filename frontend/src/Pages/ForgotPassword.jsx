@@ -30,7 +30,7 @@ function ForgotPassword() {
       if (!status) return;
       navigate("/verify-reset");
     } catch (error) {
-      console.log(error);
+      console.log(error.message);
     }
   }
 
