@@ -2,6 +2,11 @@ import { create } from "zustand";
 import { axiosInstance } from "../lib/axios.js";
 import { toast } from "react-hot-toast";
 
+// Importing useAuthStore and useChatStore for socket
+
+import { useAuthStore } from "./useAuthStore";
+import { useChatStore } from "./useChatStore";
+
 export const useRelationshipStore = create((set, get) => ({
   searchedUsers: [],
   pendingRequests: [],
@@ -9,6 +14,105 @@ export const useRelationshipStore = create((set, get) => ({
   blockedUsers: [],
   isLoading: false,
   sentRequests: [],
+
+  /*
+  SOCKET CODE For Live Friends status
+  */
+
+  subscribeToRelationshipEvents: () => {
+    const socket = useAuthStore.getState().socket;
+    if (!socket) return;
+
+    let isFetching = false;
+
+    const safeFetch = async (fn) => {
+      if (isFetching) return;
+      isFetching = true;
+      try {
+        await fn();
+      } finally {
+        isFetching = false;
+      }
+    };
+
+    socket.on("friendRequestReceived", () => {
+      safeFetch(() => get().getPendingRequests());
+    });
+
+    socket.on("friendRequestAccepted", () => {
+      safeFetch(async () => {
+        await get().getFriends();
+        await get().getSentRequests();
+        await useChatStore.getState().getUsers();
+      });
+    });
+
+    socket.on("friendRequestRejected", () => {
+      safeFetch(() => get().getSentRequests());
+    });
+
+    socket.on("friendRequestCancelled", () => {
+      safeFetch(() => get().getPendingRequests());
+    });
+
+    socket.on("userBlocked", () => {
+      const { selectedUser } = useChatStore.getState();
+
+      if (selectedUser) {
+        useChatStore.setState({
+          selectedUser: null,
+          messages: [],
+        });
+      }
+
+      safeFetch(async () => {
+        await get().getFriends();
+        await get().getPendingRequests();
+        await get().getSentRequests();
+        await get().getBlockedUsers();
+        await useChatStore.getState().getUsers();
+      });
+    });
+
+    socket.on("userUnblocked", () => {
+      safeFetch(() => get().getBlockedUsers());
+    });
+
+    socket.on("userUnfriended", () => {
+      const { selectedUser } = useChatStore.getState();
+
+      if (selectedUser) {
+        useChatStore.setState({
+          selectedUser: null,
+          messages: [],
+        });
+      }
+
+      safeFetch(async () => {
+        await get().getFriends();
+        await get().getPendingRequests();
+        await get().getSentRequests();
+        await useChatStore.getState().getUsers();
+      });
+    });
+  },
+
+  /*
+    ❌ CLEANUP
+  */
+  unsubscribeFromRelationshipEvents: () => {
+    const socket = useAuthStore.getState().socket;
+    if (!socket) return;
+
+    socket.off("friendRequestReceived");
+    socket.off("friendRequestAccepted");
+    socket.off("friendRequestRejected");
+    socket.off("friendRequestCancelled");
+    socket.off("userBlocked");
+    socket.off("userUnblocked");
+    socket.off("userUnfriended");
+  },
+
   /*
     SEARCH USERS
   */
@@ -89,7 +193,6 @@ export const useRelationshipStore = create((set, get) => ({
   getBlockedUsers: async () => {
     try {
       const res = await axiosInstance.get("/relationships/blocks/blocked");
-
       set({
         blockedUsers: res.data,
       });

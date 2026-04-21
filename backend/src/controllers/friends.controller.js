@@ -2,6 +2,10 @@ import { Relationship } from "../models/relationship.model.js";
 import { Block } from "../models/block.models.js";
 import { User } from "../models/users.js";
 
+// Importing getReceiverSocketId and socketid from config
+import { getReceiverSocketId } from "../config/socket.js";
+import { io } from "../config/socket.js";
+
 const sendFriendRequest = async (req, res) => {
   try {
     const requester = req.user._id;
@@ -47,6 +51,13 @@ const sendFriendRequest = async (req, res) => {
 
     await newFriendRequest.save();
 
+    // Added Socket For Send Friend Request user status update without refreshing frontend for receiver side
+    const receiverSocketId = getReceiverSocketId(recipient);
+
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("friendRequestReceived");
+    }
+
     res.status(201).json({ message: "Friend request sent successfully" });
   } catch (error) {
     console.error(error.message);
@@ -70,6 +81,15 @@ const AcceptFriendRequest = async (req, res) => {
 
     checkRequestExist.status = "accepted";
     await checkRequestExist.save();
+
+    // Added Socket For Accept Friend Request user status update without refreshing frontend for sender side
+
+    const receiverSocketId = getReceiverSocketId(checkRequestExist.requester);
+
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("friendRequestAccepted");
+    }
+
     res.status(201).json({ message: "Friend Request Accepted" });
   } catch (ex) {
     console.log(ex);
@@ -92,6 +112,15 @@ const RejectFriendRequest = async (req, res) => {
       return res.status(401).json({ message: "Unauthorised" });
 
     await checkRequestExist.deleteOne();
+
+    // Added Socket For Reject Friend Request user status update without refreshing frontend for sender side
+
+    const receiverSocketId = getReceiverSocketId(checkRequestExist.requester);
+
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("friendRequestRejected");
+    }
+
     res.status(200).json({ message: "Friend Request rejected successfully" });
   } catch (ex) {
     console.log(ex);
@@ -114,6 +143,15 @@ const CancelFriendRequest = async (req, res) => {
       return res.status(401).json({ message: "Unauthorised" });
 
     await checkRequestExist.deleteOne();
+
+    // Added Socket For Cancel Friend Request user status update without refreshing frontend for receiver side
+
+    const receiverSocketId = getReceiverSocketId(checkRequestExist.recipient);
+
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("friendRequestCancelled");
+    }
+
     res.status(200).json({ message: "Friend Request cancelled successfully" });
   } catch (ex) {
     console.log(ex);
@@ -261,6 +299,12 @@ const unfriend = async (req, res) => {
 
     await friendship.deleteOne();
 
+    // Added Socket For Unfriend status update without refreshing frontend for receiver side
+    const receiverSocketId = getReceiverSocketId(req.params.userId);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("userUnfriended");
+    }
+
     res.status(200).json({
       message: "Unfriended successfully",
     });
@@ -292,6 +336,12 @@ const blockUser = async (req, res) => {
       ],
     });
 
+    // Added Socket For Block user status update without refreshing frontend for receiver side
+    const receiverSocketId = getReceiverSocketId(req.params.userId);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("userBlocked");
+    }
+
     res.status(200).json({
       message: "User blocked successfully",
     });
@@ -308,6 +358,12 @@ const unblockUser = async (req, res) => {
       blocker: req.user._id,
       blocked: req.params.userId,
     });
+
+    // Added Socket For UnBlock user status update without refreshing frontend for receiver side
+    const receiverSocketId = getReceiverSocketId(req.params.userId);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("userUnblocked");
+    }
 
     res.status(200).json({
       message: "User unblocked successfully",

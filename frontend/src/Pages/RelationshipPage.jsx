@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { useRelationshipStore } from "../store/useRelationshipStore";
 
+// Import useAuthStore for Socket
+
+// import { useAuthStore } from "../store/useAuthStore";
+
 function RelationshipPage() {
   const {
     searchedUsers,
@@ -37,6 +41,26 @@ function RelationshipPage() {
     getFriends();
     getBlockedUsers();
   }, []);
+
+  // Commented this part as this useeffect socket will only in the Relationship page not globally so shifted it to app.jsx
+  //USEEFFECT FOR SOCKET TO DISPLAY LIVE FRIENDS
+
+  // const socket = useAuthStore((state) => state.socket);
+
+  // useEffect(() => {
+  //   if (!socket) return;
+
+  //   const { subscribeToRelationshipEvents, unsubscribeFromRelationshipEvents } =
+  //     useRelationshipStore.getState();
+
+  //   // ✅ subscribe when socket ready
+  //   subscribeToRelationshipEvents();
+
+  //   // ❌ cleanup when component unmounts OR socket changes
+  //   return () => {
+  //     unsubscribeFromRelationshipEvents();
+  //   };
+  // }, [socket]);
 
   /*
     SEARCH DEBOUNCE
@@ -220,11 +244,11 @@ function RelationshipPage() {
                 key={user._id}
                 className="flex justify-between items-center p-3 rounded-xl bg-base-200"
               >
-                <span>{user.blocked.userName}</span>
+                <span>{user.userName}</span>
 
                 <button
                   className="btn btn-secondary btn-sm"
-                  onClick={() => unblockUser(user.blocked._id)}
+                  onClick={() => unblockUser(user._id)}
                 >
                   Unblock
                 </button>

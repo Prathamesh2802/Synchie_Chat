@@ -17,6 +17,9 @@ import ForgotPassword from "./Pages/ForgotPassword";
 import VerifyReset from "./Pages/VerifyReset";
 import PageNotFound from "./Pages/PageNotFound";
 
+// IMPORT STATEMENT for UseRelationShipStore
+import { useRelationshipStore } from "./store/useRelationshipStore";
+
 function App() {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
   const { theme } = useThemeStore();
@@ -24,6 +27,25 @@ function App() {
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
+
+  //USEEFFECT FOR SOCKET TO DISPLAY LIVE FRIENDS
+
+  const socket = useAuthStore((state) => state.socket);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const { subscribeToRelationshipEvents, unsubscribeFromRelationshipEvents } =
+      useRelationshipStore.getState();
+
+    // ✅ subscribe when socket ready
+    subscribeToRelationshipEvents();
+
+    // ❌ cleanup when component unmounts OR socket changes
+    return () => {
+      unsubscribeFromRelationshipEvents();
+    };
+  }, [socket]);
 
   if (isCheckingAuth && !authUser) {
     return (
