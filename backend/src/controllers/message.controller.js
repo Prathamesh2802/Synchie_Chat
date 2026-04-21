@@ -64,8 +64,6 @@ const sendMessage = async (req, res) => {
       ],
     });
 
-    console.log(isFriend);
-
     if (!isFriend) {
       return res.status(400).json({
         message:
