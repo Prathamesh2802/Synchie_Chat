@@ -2,6 +2,7 @@ import cloudinary from "../config/cloudinary.js";
 import { getReceiverSocketId, io } from "../config/socket.js";
 import { Block } from "../models/block.models.js";
 import Message from "../models/message.models.js";
+import { Relationship } from "../models/relationship.model.js";
 import { User } from "../models/users.js";
 
 const getUsersForSidebar = async (req, res) => {
@@ -53,6 +54,25 @@ const sendMessage = async (req, res) => {
           "Cannot send message at this moment. User is no longer responding to this converstation",
       });
     }
+
+    // check if the user is friend or not, if not you cannot send message
+
+    const isFriend = await Relationship.findOne({
+      $or: [
+        { requester: senderId, recipient: receiverId },
+        { requester: receiverId, recipient: senderId },
+      ],
+    });
+
+    console.log(isFriend);
+
+    if (!isFriend) {
+      return res.status(400).json({
+        message:
+          "Cannot send message at this moment. User is no longer responding to this converstation",
+      });
+    }
+
     let imageurl;
     if (image) {
       //upload base64 image to cloudinary
