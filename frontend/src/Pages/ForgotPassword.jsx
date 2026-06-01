@@ -7,7 +7,7 @@ import { useAuthStore } from "../store/useAuthStore";
 function ForgotPassword() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
-  const { sendResetOTP } = useAuthStore();
+  const { sendResetOTP, isSendingOTP } = useAuthStore();
 
   function validateData() {
     if (!email.trim()) {
@@ -60,6 +60,7 @@ function ForgotPassword() {
             <button
               className="btn btn-primary p-2"
               onClick={(e) => ResetPassword(e)}
+              disabled={isSendingOTP}
             >
               Send OTP
             </button>

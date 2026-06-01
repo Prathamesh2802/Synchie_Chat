@@ -13,7 +13,7 @@ export const useAuthStore = create((set, get) => ({
   isloggingout: false,
   isCheckingAuth: true,
   isUpdatingProfile: false,
-
+  isSendingOTP: false,
   // Socket IO Methods
   onlineUsers: [],
   socket: null,
@@ -106,6 +106,7 @@ export const useAuthStore = create((set, get) => ({
 
   // Forgot Password, OTP and Token creation
   sendResetOTP: async (email) => {
+    set({ isSendingOTP: true });
     try {
       const res = await axiosInstance.post("/auth/forgot-password", { email });
 
@@ -119,6 +120,8 @@ export const useAuthStore = create((set, get) => ({
       return true;
     } catch (error) {
       toast.error(error.response?.data?.message || "Error");
+    } finally {
+      set({ isSendingOTP: false });
     }
   },
   // Reset password and otp verify
