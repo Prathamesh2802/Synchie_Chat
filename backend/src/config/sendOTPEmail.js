@@ -14,6 +14,7 @@ async function connectEmail() {
     },
   });
 
+  console.log("Connecting Email");
   await transporter.verify();
 
   console.log("Email Service Connected");
