@@ -59,7 +59,7 @@ async function startServer() {
   try {
     await connectdb();
 
-    await connectEmail().catch(console.error);
+    await connectEmail();
 
     // Adding redis connect function as well
 
