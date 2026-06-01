@@ -13,7 +13,10 @@ import {
   resetPassword,
 } from "../controllers/auth.controller.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
-import { RateLimitLogin } from "../middleware/redis.middleware.js";
+import {
+  RateLimitLogin,
+  forgetPasswordOTP,
+} from "../middleware/redis.middleware.js";
 
 const router = express.Router();
 
@@ -43,7 +46,7 @@ router.post("/resend-otp", resendOtp);
 
 // Routes for Forgot Password and OTp and Password verify and password change
 
-router.post("/forgot-password", forgotPassword);
+router.post("/forgot-password", forgetPasswordOTP, forgotPassword);
 
 router.post("/reset-password", resetPassword);
 

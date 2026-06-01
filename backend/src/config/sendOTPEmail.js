@@ -13,7 +13,7 @@ function connectEmail() {
   const client = SibApiV3Sdk.ApiClient.instance;
 
   // API key from Brevo dashboard
-  client.authentications["api-key"].apiKey = process.env.SMTP_ID;
+  client.authentications["api-key"].apiKey = process.env.APIKEY_EMAIL;
 
   apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
@@ -23,7 +23,7 @@ function connectEmail() {
 async function sendMailOTP(emailid, otp, text) {
   const email = {
     sender: {
-      email: process.env.API_EMAIL, // you can reuse same env var name if you want
+      email: process.env.SMTP_FROM_EMAIL, // you can reuse same env var name if you want
       name: process.env.API_EMAIL_NAME,
     },
     to: [

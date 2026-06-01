@@ -22,6 +22,31 @@ export const messageRateLimit = async (req, res, next) => {
   }
 };
 
+export const forgetPasswordOTP = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    if (!email)
+      return res.status(400).json({ message: "Email cannot be empty" });
+    const key = `email:rate:${email}`;
+    const count = await redis.incr(key);
+    if (count == 1) {
+      await redis.expire(key, 300); // 5 minutes
+    }
+    if (count > 1) {
+      return res
+        .status(401)
+        .json({
+          message:
+            "OTP Already Sent, Please check the inbox or wait for 5 Minutes to resend OTP.",
+        });
+    }
+    next();
+  } catch (error) {
+    console.log(error.message);
+    next();
+  }
+};
+
 export const RateLimitLogin = async (req, res, next) => {
   try {
     const { email } = req.body;
